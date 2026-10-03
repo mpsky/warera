@@ -1,62 +1,97 @@
-/* Tema nukopijuota iš app.warera.io: Saira šriftas, tamsus teal fonas, raudoni gradientiniai mygtukai. */
+/* Tema pagal app.warera.io: Saira, tamsus teal, raudoni gradientiniai akcentai, segmentiniai skill'ai. */
 :root{
-  --bg:#161a1d; --panel:#0e1517; --row:#172629; --raise:#29323c;
-  --line:#050808; --tx:#cee0e3; --tx2:#95bcc3; --mut:#4a7a82;
-  --red:#d25a5c; --red-l:#e6a5a6; --red-xl:#ecb8b9; --red-d1:#7a2123; --red-d2:#5e1a1b; --red-d3:#390f10; --red-d4:#1c0808;
-  --ok:#5fb08a; --r:8px;
+  --bg:#161a1d;--panel:#0e1517;--row:#172629;--raise:#29323c;
+  --tx:#cee0e3;--tx2:#95bcc3;--mut:#4a7a82;
+  --red:#d25a5c;--red-l:#e6a5a6;--red-xl:#ecb8b9;--red1:#7a2123;--red2:#5e1a1b;--red3:#390f10;
+  --ok:#6fe0a0;--r:8px;
   --edge:0 0 0 1px #050808,0 1px 0 1px #050808,2px 2px 10px rgba(0,0,0,.5);
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:600 15px/1.45 Saira,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh;
-  background-image:radial-gradient(900px 420px at 50% -8%,#1d3338 0,transparent 70%)}
-.app{max-width:1100px;margin:0 auto;padding:16px 16px 48px}
-.hero{text-align:center;padding:22px 0 12px}
-h1{margin:0;font-size:clamp(30px,8vw,46px);font-weight:700;color:var(--red);letter-spacing:.02em;text-shadow:0 0 18px rgba(210,90,92,.55)}
-h1 em{font-style:normal;color:var(--red)}
-.hero p{color:var(--tx2);margin:6px 0 16px;font-weight:400}
-.search{display:flex;gap:8px;max-width:520px;margin:0 auto}
-input{flex:1;min-width:0;padding:13px 14px;border-radius:var(--r);border:0;background:var(--row);color:var(--tx);font:inherit;font-size:16px;box-shadow:var(--edge)}
-input::placeholder{color:var(--mut)}
-input:focus{outline:2px solid var(--red-d1)}
-button{padding:0 20px;min-height:48px;border-radius:var(--r);border:0;background:linear-gradient(45deg,var(--red-d1),var(--red-d2));color:var(--red-xl);font:inherit;font-size:14px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;box-shadow:var(--edge)}
-button:active{filter:brightness(.9)}
-button:disabled{opacity:.6}
-.err{margin:12px auto 0;max-width:520px;padding:10px;border-radius:var(--r);color:var(--red-l);background:var(--red-d3);box-shadow:var(--edge)}
-.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
-.card{background:var(--panel);border-radius:var(--r);box-shadow:var(--edge);overflow:hidden}
-.card.wide{grid-column:1/-1}
-.card-h{display:flex;gap:8px;align-items:center;padding:10px 14px;background:var(--row)}
-.card-h h2{margin:0;font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--tx2)}
-.card-b{padding:14px}
-.stat{display:flex;align-items:baseline;min-width:0;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid #ffffff0d}
-.stat:last-child{border-bottom:0}
-.stat span{color:var(--mut);flex:none}.stat b{color:var(--tx);min-width:0;overflow-wrap:anywhere;text-align:right}
-.who{display:flex;gap:14px;align-items:flex-start}.who>div{flex:1;min-width:0}
-.who img{border-radius:var(--r);background:#000;box-shadow:var(--edge)}
-.desc{color:var(--tx2);margin:8px 0;font-weight:400}
-.skills{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
-.skill{background:var(--row);border-radius:6px;padding:9px 10px;box-shadow:var(--edge)}
-.skill-h{display:flex;justify-content:space-between;margin-bottom:4px;color:var(--tx)}
-small{color:var(--mut);display:block;font-weight:400}
-.bar{height:8px;background:#0a0f10;border-radius:4px;overflow:hidden;margin:4px 0;box-shadow:inset 0 0 0 1px #050808}
-.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--red-d1),var(--red))}
-.bar i.green{background:linear-gradient(90deg,#2c6a5a,var(--ok))}
-.bar i.gold{background:linear-gradient(90deg,var(--red-d1),var(--red))}
-.slots{display:grid;gap:8px}
-.slot{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:6px;background:var(--row);box-shadow:var(--edge)}
-.slot.empty{opacity:.55}.slot .ico{font-size:24px}.slot>div{flex:1;min-width:0}
-.ranks{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
-.rank{padding:8px;border-radius:6px;background:var(--row);text-align:center;box-shadow:var(--edge)}
-.rank b{display:block;font-size:20px;color:var(--red-l)}
-.tier{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--tx2)}
-.tabs{display:flex;gap:6px;flex-wrap:wrap}
-.tabs button{min-height:40px;background:var(--row);color:var(--tx2)}
-.tabs button.on{background:linear-gradient(45deg,var(--red-d1),var(--red-d2));color:var(--red-xl)}
-.plan{display:grid;gap:6px;margin:10px 0}
-.plan-row{display:grid;grid-template-columns:1fr auto 44px;gap:10px;padding:8px 10px;border-radius:6px;background:var(--row);box-shadow:var(--edge)}
-.plan-row.up{box-shadow:0 0 0 1px #2c6a5a}.plan-row.down{box-shadow:0 0 0 1px var(--red-d1)}
-.plan-row .delta{text-align:right}.up .delta{color:var(--ok)}.down .delta{color:var(--red)}
-.summary{display:flex;flex-wrap:wrap;gap:6px 18px;padding:10px 0;color:var(--tx2)}
-.summary b{color:var(--tx)}
-.note{margin-top:6px}
-@media(max-width:480px){.app{padding:10px 12px 40px}.grid{grid-template-columns:1fr}}
+body{margin:0;background:var(--bg);color:var(--tx);font:600 14px/1.4 Saira,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh;
+  background-image:radial-gradient(800px 360px at 50% -8%,#1d3338 0,transparent 70%)}
+.app{max-width:640px;margin:0 auto;padding:10px 10px 40px;overflow-x:clip}
+.search button{padding:0 12px;flex:none}
+small{color:var(--mut);font-weight:400}
+.top{display:flex;flex-wrap:nowrap;min-width:0;gap:10px;align-items:center;justify-content:space-between;margin-bottom:8px}
+h1{margin:0;font-size:20px;flex:none;font-weight:700;color:var(--red);text-shadow:0 0 14px rgba(210,90,92,.55);white-space:nowrap}
+h1 em{font-style:normal}
+.search{display:flex;gap:6px;flex:1;min-width:0;max-width:360px}
+input{flex:1;min-width:0;padding:10px 12px;border-radius:var(--r);border:0;background:var(--row);color:var(--tx);font:inherit;font-size:16px;box-shadow:var(--edge)}
+input::placeholder{color:var(--mut)}input:focus{outline:2px solid var(--red1)}
+button{font:inherit;cursor:pointer;color:var(--red-xl);border:0;border-radius:var(--r);min-height:40px;padding:0 14px;
+  background:linear-gradient(45deg,var(--red1),var(--red2));box-shadow:var(--edge);display:inline-flex;align-items:center;justify-content:center;gap:6px}
+button:active{filter:brightness(.9)}button:disabled{opacity:.6}
+.err{padding:10px;border-radius:var(--r);color:var(--red-l);background:var(--red3);box-shadow:var(--edge)}
+.empty{color:var(--tx2);text-align:center;margin-top:40px;font-weight:400}
+
+/* siaura žaidėjo juosta */
+.strip{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--panel);border-radius:var(--r);box-shadow:var(--edge);
+  background-image:linear-gradient(90deg,#172629,transparent)}
+.av{position:relative;width:46px;height:46px;flex:none;border-radius:50%;display:grid;place-items:center;background:#000;box-shadow:0 0 0 2px var(--red1),var(--edge);color:var(--mut)}
+.av img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.lv{position:absolute;right:-6px;bottom:-4px;min-width:22px;height:22px;border-radius:11px;background:var(--red2);color:var(--red-xl);font-size:12px;display:grid;place-items:center;box-shadow:0 0 0 1px #050808}
+.who{min-width:0;flex:1}.nick{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px}.nick em{color:#f0c050;font-style:normal}
+.who small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--tx2)}
+.bars{display:grid;gap:3px;width:118px;flex:none}
+.mini{display:grid;grid-template-columns:14px 1fr auto;gap:5px;align-items:center;color:var(--c);font-size:11px}
+.mini div{height:5px;background:#0a0f10;border-radius:3px;overflow:hidden}.mini i{display:block;height:100%;background:var(--c)}
+.mini b{font-weight:600;color:var(--tx2);min-width:42px;text-align:right}
+
+/* tab'ai kaip žaidime */
+.tabs{display:flex;gap:6px}
+.tabs.main{margin:8px 0 0;background:var(--panel);border-radius:var(--r) var(--r) 0 0;box-shadow:var(--edge)}
+.tabs.main button{flex:1;background:none;box-shadow:none;border-radius:0;color:var(--mut);min-height:44px;border-bottom:2px solid transparent}
+.tabs.main button.on{color:var(--red-xl);background:linear-gradient(#1a2a2e,transparent);border-bottom-color:var(--red)}
+.tabs.sub button,.pills button{background:var(--row);color:var(--tx2);min-height:36px;padding:0 12px}
+.tabs.sub button.on,.pills button.on{background:linear-gradient(45deg,var(--red1),var(--red2));color:var(--red-xl)}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.panel{background:var(--panel);border-radius:0 0 var(--r) var(--r);box-shadow:var(--edge);padding:10px 12px 14px}
+.sect{display:flex;align-items:center;gap:8px;margin:14px 0 8px;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;font-size:12px;
+  border-bottom:2px solid #1d3338;padding-bottom:3px}
+.sect small{margin-left:auto;text-transform:none;letter-spacing:0}
+.sect:first-child{margin-top:4px}
+.blurb{color:var(--tx2);font-weight:400;margin:8px 0 0}
+.warn{color:var(--red-l);margin:6px 0 0}
+.note{color:var(--mut);font-weight:400;font-size:12px;margin:12px 0 0}
+
+/* rodikliai */
+.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.chip{background:var(--row);border-radius:6px;padding:6px 8px;box-shadow:var(--edge)}
+.chip small{display:block;font-size:11px;line-height:1.1;color:var(--mut)}.chip b{font-size:15px}
+.result{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:6px;margin-top:10px}
+.result>div{background:var(--row);border-radius:6px;padding:7px 9px;box-shadow:var(--edge)}
+.result small{display:block;font-size:11px}.result b{font-size:15px}.pos{color:var(--ok)}.neg{color:var(--red)}
+
+/* skill segmentai */
+.skills{display:grid;gap:10px;margin-bottom:10px}
+.skill-h{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.skill-h span{flex:1;color:var(--tx)}.skill-h small{color:var(--tx2)}.skill-h em{font-style:normal;min-width:24px;text-align:right}
+.segs{display:grid;grid-template-columns:repeat(10,1fr);gap:3px}
+.segs i{aspect-ratio:1;max-height:30px;border-radius:4px;background:#0c1214;box-shadow:inset 0 0 0 1px #131d20;display:grid;place-items:center;color:var(--c)}
+.segs i.on{background:linear-gradient(#ffffff1c,#0000),var(--seg);filter:saturate(.8) brightness(.85)}
+.segs i.add{background:linear-gradient(#ffffff2a,#0000),var(--seg);box-shadow:0 0 8px var(--c),inset 0 0 0 1px var(--c)}
+.segs i.rm{box-shadow:inset 0 0 0 1px var(--red1);background:repeating-linear-gradient(45deg,#2a0f10,#2a0f10 3px,#0c1214 3px,#0c1214 6px)}
+.segs i svg{width:60%;height:60%}
+
+/* įranga (žaidimo „cells“) */
+.gear{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.cell{display:flex;flex-direction:column;align-items:center;gap:1px;padding:8px 4px 6px;border-radius:6px;text-align:center;box-shadow:var(--edge);background:linear-gradient(#1d3338,#101b1d);color:var(--tx2);min-width:0}
+.cell b{font-size:13px;color:var(--tx)}.cell small{font-size:10px;line-height:1.1}
+.dur{width:80%;height:4px;background:#0a0f10;border-radius:2px;overflow:hidden;margin-top:3px}.dur i{display:block;height:100%;background:var(--ok)}
+.t5,.cell.t5{background:linear-gradient(#5e1a1b,#2a0e0f);color:#e6a5a6}
+.t4,.cell.t4{background:linear-gradient(#5a4f12,#26210a);color:#e6d27a}
+.t3,.cell.t3{background:linear-gradient(#3a1f5e,#1a0e2c);color:#c9a5f0}
+.t2,.cell.t2{background:linear-gradient(#14305e,#0b1630);color:#9bbcf0}
+.t1,.cell.t1{background:linear-gradient(#12482c,#0a2316);color:#8fe0b0}
+.t0,.cell.t0{background:linear-gradient(#27393d,#141f21);color:#95bcc3}
+.t-1,.cell.t-1{opacity:.5}
+
+/* pirkimo sąrašas */
+.shop{display:grid;gap:6px}
+.row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;background:var(--row);box-shadow:var(--edge)}
+.row>div{flex:1;min-width:0}.row b{display:block}.row small{display:block;overflow:hidden;text-overflow:ellipsis}
+.row.t5{background:linear-gradient(90deg,#4a1617,#172629)}.row.t4{background:linear-gradient(90deg,#463e10,#172629)}
+.row.t3{background:linear-gradient(90deg,#33194f,#172629)}.row.t2{background:linear-gradient(90deg,#112a52,#172629)}
+.row.t1{background:linear-gradient(90deg,#0f3a24,#172629)}
+.price{color:#f0c050}
+@media(min-width:520px){.chips{grid-template-columns:repeat(6,1fr)}.gear{grid-template-columns:repeat(7,1fr)}}

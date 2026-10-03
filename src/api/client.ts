@@ -32,3 +32,14 @@ export async function findUser(query: string): Promise<UserLite> {
 
 export const getCountryName = (countryId: string) =>
   call<{ name: string }>("country.getCountryById", { countryId }).then((c) => c.name).catch(() => countryId);
+
+/** Įrangos kainos (mediana iš paskutinių sandorių) + ammo kainos. */
+export async function getPrices(): Promise<Record<string, number | null>> {
+  const [gear, base] = await Promise.all([
+    fetch("/api/_gearPrices").then((r) => (r.ok ? r.json() : {})).catch(() => ({})),
+    call<Record<string, number>>("itemTrading.getPrices").catch(() => ({} as Record<string, number>)),
+  ]);
+  const out: Record<string, number | null> = { ...base };
+  for (const [k, v] of Object.entries(gear as Record<string, { price: number } | null>)) out[k] = v?.price ?? null;
+  return out;
+}

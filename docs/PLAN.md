@@ -15,6 +15,11 @@ Tikslo funkcija – profilis (Damage / Tank / Economy): Σ w·ln(1+metrika). Dam
 **Svoriai ir formulės – euristika**, ne oficialūs žaidimo skaičiai; reikia sukalibruoti pagal tikras žaidimo formules.
 Algoritmas: godus (gain/cost, 3 lygių lookahead) + keitimų lokali paieška; rodo reset kainą (`resetSkillsCostPerPoint`).
 
+## Atnaujinimas (v2)
+- Modelis: žala = ataka·(pataikymas·(1+kritas·kritžala)+nepataikymas·0,5); ataka = (lygis+ginklas)·ammo·rangas (patikrinta: 466). Šarvai/išsisukimas po soft cap x/(x+39,4) (pritaikyta pagal API `totalAfterSoftCap`). Tikslas „Žala“ = žala per vieną sveikatos juostą.
+- Įrangos kainos: `transaction.getPaginatedTransactions` (itemMarket) mediana per kodą, serveris kešuoja 10 min (`/api/_gearPrices`).
+- Žaidimo ikonų neturime (media.warera.io užblokuota) – savos SVG ikonos.
+
 ## Etapai
 1. ✅ Karkasas, proxy, profilio kortelės, skill optimizatorius (+testai).
 2. Gyvo API patikra, tipų/laukų korekcija, ikonos pagal žaidimo stilių.
