@@ -24,8 +24,8 @@ export interface GearPick { code: string | null; stats: Partial<Record<SkillKey,
 export type Gear = Record<Slot, GearPick>;
 export type Prices = Record<string, number | null>;
 
-/** Armor/dodge soft-cap: x/(x+K). K≈39.4 – pritaikyta pagal API `totalAfterSoftCap` (24→38, 38→49). */
-export const SOFT_K = 39.4;
+/** Armor/dodge soft cap: x/(x+40). 40 = `softCap` žaidimo klijento konfigūracijoje; sutampa su API `totalAfterSoftCap` (24→38, 38→49). */
+export const SOFT_K = 40;
 export const soft = (x: number) => (x <= 0 ? 0 : x / (x + SOFT_K));
 /** Nepataikęs smūgis padaro pusę žalos ir negali būti kritinis (žaidimo aprašymas). */
 export const MISS_FACTOR = 0.5;

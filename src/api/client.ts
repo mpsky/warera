@@ -30,8 +30,8 @@ export async function findUser(query: string): Promise<UserLite> {
   return ok.find((u) => u.username.toLowerCase() === q.toLowerCase()) ?? ok[0];
 }
 
-export const getCountryName = (countryId: string) =>
-  call<{ name: string }>("country.getCountryById", { countryId }).then((c) => c.name).catch(() => countryId);
+export const getCountry = (countryId: string) =>
+  call<{ name: string; code: string }>("country.getCountryById", { countryId }).catch(() => ({ name: countryId, code: "" }));
 
 /** Įrangos kainos (mediana iš paskutinių sandorių) + ammo kainos. */
 export async function getPrices(): Promise<Record<string, number | null>> {

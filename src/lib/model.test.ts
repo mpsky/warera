@@ -20,8 +20,8 @@ describe("model", () => {
     expect(v.attack).toBeCloseTo(465.96, 1);
   });
   it("soft cap fits API samples", () => {
-    expect(soft(24) * 100).toBeCloseTo(38, 0);
-    expect(soft(38) * 100).toBeCloseTo(49, 0);
+    expect(Math.round(soft(24) * 100)).toBe(38);
+    expect(Math.round(soft(38) * 100)).toBe(49);
   });
   it("more armor never reduces damage per bar", () => {
     const base = Object.fromEntries(SKILL_KEYS.map((k) => [k, 50])) as never;

@@ -1,4 +1,4 @@
-import { Icon } from "./Icon";
+import { GameImg, Icon, itemPath } from "./Icon";
 import { Segments } from "./Segments";
 import { SKILL, SLOT_LABEL, TIER_LABEL, AMMO_LABEL, fmt } from "../lib/labels";
 import { SLOTS, combat, tierOf } from "../lib/model";
@@ -49,14 +49,14 @@ export function StatsTab({ user, cfg, eq, vals }: { user: UserLite; cfg: GameCon
           const it = eq[slot]; const t = it ? Math.max(0, tierOf(slot, it.code)) : -1;
           return (
             <div key={slot} className={"cell t" + t} title={SLOT_LABEL[slot]}>
-              <Icon name={slot} size={30} />
+              <GameImg path={itemPath(slot, it?.code)} size={44} fallback="star" />
               <b>{it ? Object.entries(it.skills ?? {}).map(([k, v]) => `+${fmt(v, 0)}`).join(" ") : "—"}</b>
               <small>{it ? TIER_LABEL[t] : SLOT_LABEL[slot]}</small>
               {it && <div className="dur"><i style={{ width: `${(it.state / it.maxState) * 100}%` }} /></div>}
             </div>
           );
         })}
-        <div className="cell t2" title="Šoviniai"><Icon name="ammo" size={30} /><b>{eq.ammo ? AMMO_LABEL[eq.ammo] ?? eq.ammo : "—"}</b><small>Šoviniai</small></div>
+        <div className="cell t2" title="Šoviniai"><GameImg path={itemPath("ammo", eq.ammo)} size={44} /><b>{eq.ammo ? AMMO_LABEL[eq.ammo] ?? eq.ammo : "—"}</b><small>Šoviniai</small></div>
       </div>
     </>
   );

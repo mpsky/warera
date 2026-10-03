@@ -95,3 +95,6 @@ button:active{filter:brightness(.9)}button:disabled{opacity:.6}
 .row.t1{background:linear-gradient(90deg,#0f3a24,#172629)}
 .price{color:#f0c050}
 @media(min-width:520px){.chips{grid-template-columns:repeat(6,1fr)}.gear{grid-template-columns:repeat(7,1fr)}}
+.gimg{object-fit:contain;display:inline-block;vertical-align:middle;flex:none}
+.sub{display:flex;align-items:center;gap:4px}
+.cell .gimg{filter:drop-shadow(0 2px 3px #0008)}

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Icon } from "./Icon";
+import { GameImg, Icon, itemPath } from "./Icon";
 import { Segments } from "./Segments";
 import { CombatChips } from "./StatsTab";
 import { AMMO_LABEL, SKILL, SLOT_LABEL, TIER_LABEL, fmt, money } from "../lib/labels";
@@ -33,7 +33,7 @@ export function BuildTab({ user, cfg, eq, prices }: { user: UserLite; cfg: GameC
       <p className="blurb">{profile.blurb}. Lygis {user.leveling.level}, {plan.budget} taškų.</p>
       {pid !== "economy" && <div className="pills" style={{ marginTop: 8 }}><button className={keepEco ? "on" : ""} onClick={() => setKeepEco(!keepEco)}>{keepEco ? "✓ " : ""}Palikti ekonomikos skill’us</button></div>}
 
-      <div className="sect">Įrangos biudžetas <Icon name="coin" size={14} /></div>
+      <div className="sect">Įrangos biudžetas <GameImg path="itemsv2/gold.png" size={16} fallback="coin" /></div>
       <div className="pills">
         {BUDGETS.map((b) => <button key={b} className={b === budget ? "on" : ""} onClick={() => setBudget(b)}>{b === Infinity ? "Be ribos" : b === 0 ? "Nieko" : b}</button>)}
       </div>
@@ -70,7 +70,7 @@ export function BuildTab({ user, cfg, eq, prices }: { user: UserLite; cfg: GameC
           const g = plan.gear[s]; const t = g.code ? tierOf(s, g.code) : -1;
           return (
             <div key={s} className={"row t" + t}>
-              <Icon name={s} size={22} />
+              <GameImg path={itemPath(s, g.code)} size={38} />
               <div><b>{SLOT_LABEL[s]}: {g.code ? TIER_LABEL[t] : "nenaudoti"}</b>
                 <small>{g.code ?? ""} · {Object.entries(g.stats).map(([k, v]) => `${SKILL[k as keyof typeof SKILL].name} ~${fmt(v, 0)}`).join(", ")}</small></div>
               <span className="price">{g.owned ? "turi" : money(g.price)}</span>
@@ -78,7 +78,7 @@ export function BuildTab({ user, cfg, eq, prices }: { user: UserLite; cfg: GameC
           );
         })}
         <div className="row">
-          <Icon name="ammo" size={22} />
+          <GameImg path={itemPath("ammo", plan.ammo)} size={38} />
           <div><b>Šoviniai: {plan.ammo ? AMMO_LABEL[plan.ammo] : "—"}</b>
             <small>+{AMMO.find((a) => a.code === plan.ammo)?.pct ?? 0}% atakos · {plan.ammo && prices[plan.ammo] != null ? `${money(prices[plan.ammo]!)} / vnt.` : ""}</small></div>
         </div>

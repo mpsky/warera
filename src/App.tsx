@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { findUser, getConfig, getCountryName, getEquipment, getPrices } from "./api/client";
+import { findUser, getConfig, getCountry, getEquipment, getPrices } from "./api/client";
 import type { Equipment, GameConfig, UserLite } from "./lib/types";
 import { Icon } from "./components/Icon";
 import { PlayerStrip } from "./components/PlayerStrip";
@@ -8,7 +8,7 @@ import { BuildTab } from "./components/BuildTab";
 import { PROFILES, type Prices } from "./lib/model";
 import { currentState } from "./lib/optimizer";
 
-interface Data { user: UserLite; eq: Equipment; cfg: GameConfig; country: string; prices: Prices }
+interface Data { user: UserLite; eq: Equipment; cfg: GameConfig; country: { name: string; code: string }; prices: Prices }
 
 export default function App() {
   const [q, setQ] = useState(() => new URLSearchParams(location.search).get("u") ?? "");
@@ -22,7 +22,7 @@ export default function App() {
     setBusy(true); setErr("");
     try {
       const [cfg, user, prices] = await Promise.all([getConfig(), findUser(q), getPrices()]);
-      const [eq, country] = await Promise.all([getEquipment(user._id), getCountryName(user.country)]);
+      const [eq, country] = await Promise.all([getEquipment(user._id), getCountry(user.country)]);
       setData({ user, eq, cfg, country, prices });
       history.replaceState(null, "", `?u=${encodeURIComponent(user.username)}`);
     } catch (x) { setErr((x as Error).message); setData(null); }
