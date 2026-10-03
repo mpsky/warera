@@ -29,3 +29,6 @@ export async function findUser(query: string): Promise<UserLite> {
   const ok = users.filter((u): u is UserLite => !!u);
   return ok.find((u) => u.username.toLowerCase() === q.toLowerCase()) ?? ok[0];
 }
+
+export const getCountryName = (countryId: string) =>
+  call<{ name: string }>("country.getCountryById", { countryId }).then((c) => c.name).catch(() => countryId);

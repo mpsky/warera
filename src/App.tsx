@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { findUser, getConfig, getEquipment } from "./api/client";
+import { findUser, getConfig, getCountryName, getEquipment } from "./api/client";
 import type { Equipment, GameConfig, UserLite } from "./lib/types";
 import { SKILL_KEYS } from "./lib/types";
 import { Card, Stat, Bar } from "./components/Card";
 import { BuildPlanner } from "./components/BuildPlanner";
 import { RANK_LABEL, SKILL_LABEL, SLOTS, fmt } from "./lib/labels";
 
-interface Data { user: UserLite; eq: Equipment; cfg: GameConfig }
+interface Data { user: UserLite; eq: Equipment; cfg: GameConfig; country: string }
 
 export default function App() {
   const [q, setQ] = useState(() => new URLSearchParams(location.search).get("u") ?? "");
@@ -19,8 +19,8 @@ export default function App() {
     setBusy(true); setErr("");
     try {
       const [cfg, user] = await Promise.all([getConfig(), findUser(q)]);
-      const eq = await getEquipment(user._id);
-      setData({ user, eq, cfg });
+      const [eq, country] = await Promise.all([getEquipment(user._id), getCountryName(user.country)]);
+      setData({ user, eq, cfg, country });
       history.replaceState(null, "", `?u=${encodeURIComponent(user.username)}`);
     } catch (x) { setErr((x as Error).message); setData(null); }
     setBusy(false);
@@ -29,7 +29,7 @@ export default function App() {
   return (
     <main className="app">
       <header className="hero">
-        <h1>⚔ WarEra <em>Build Planner</em></h1>
+        <h1>War Era <em>Build Planner</em></h1>
         <p>Įveskite žaidėjo nicką – gausite profilį ir optimalų skill build’ą.</p>
         <form onSubmit={go} className="search">
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Žaidėjo nickas arba ID" autoCapitalize="off" autoCorrect="off" enterKeyHint="search" />
@@ -42,7 +42,7 @@ export default function App() {
   );
 }
 
-function Profile({ user, eq, cfg }: Data) {
+function Profile({ user, eq, cfg, country }: Data) {
   const lv = user.leveling;
   const att = user.skills.attack;
   const lastReset = user.dates?.lastSkillsResetAt;
@@ -52,7 +52,7 @@ function Profile({ user, eq, cfg }: Data) {
         <div className="who">
           {user.avatarUrl && <img src={user.avatarUrl} alt="" width={72} height={72} />}
           <div>
-            <Stat k="Lygis" v={lv.level} /><Stat k="Šalis" v={user.country} />
+            <Stat k="Lygis" v={lv.level} /><Stat k="Šalis" v={country} />
             <Stat k="Karinis rangas" v={user.militaryRank} />
             <Stat k="Premium" v={user.infos?.isPremium ? "taip" : "ne"} />
             <Stat k="Aktyvus" v={user.isActive ? "taip" : "ne"} />

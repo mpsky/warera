@@ -11,7 +11,7 @@ export const SLOTS = [["weapon", "🔫", "Ginklas"], ["helmet", "🪖", "Šalmas
 export const RANK_LABEL: Record<string, string> = {
   userDamages: "Žala", weeklyUserDamages: "Savaitės žala", userLevel: "Lygis", userWealth: "Turtas",
   userTerrain: "Teritorija", userBounty: "Bounty", userCasesOpened: "Atidaryta dėžių", userReferrals: "Referalai",
-  userSubscribers: "Sekėjai", userPremiumMonths: "Premium mėn.", userPremiumGifts: "Premium dovanos", userGemsPurchased: "Gems",
+  userSkinsOwned: "Skin'ai", userMilestoneTiers: "Milestone'ai", userMissionsClaimed: "Misijos", userSubscribers: "Sekėjai", userPremiumMonths: "Premium mėn.", userPremiumGifts: "Premium dovanos", userGemsPurchased: "Gems",
 };
 export const fmt = (n: unknown, d = 1) =>
   typeof n === "number" ? n.toLocaleString("lt-LT", { maximumFractionDigits: d }) : "—";
