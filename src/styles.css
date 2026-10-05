@@ -132,3 +132,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--red);outline-of
 .mini-btn{margin-left:auto;min-height:28px;padding:0 8px;font-size:11px;background:var(--row);color:var(--tx2);text-transform:none;letter-spacing:0}
 .mini-btn.on{color:var(--red-xl);background:linear-gradient(45deg,var(--red1),var(--red2))}
 .tabs.main button{padding:0 6px;font-size:13px}
+
+.cmp th{font-weight:400;color:var(--mut);font-size:11px;text-align:right;padding:2px 4px}
+.fit{font-size:13px;min-width:44px;text-align:right}
+.best{font-size:10px;text-transform:uppercase;letter-spacing:.06em;background:#f0c050;color:#241a05;border-radius:4px;padding:1px 5px}
+@media(min-width:900px){.col-sticky{position:static}}

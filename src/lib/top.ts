@@ -4,6 +4,7 @@ import {
   type Gear, type GearPick, type Levels, type Prices, type Slot, type Vals,
 } from "./model";
 import { AMMO, pointsToRefund } from "./optimizer";
+import { PROFILES, type ProfileId } from "./model";
 
 export type Category = "attack" | "loot" | "economy";
 export interface TopPlayer {
@@ -77,12 +78,31 @@ export const ECO_METRICS: Metric[] = [
   { key: "management", label: "Vadyba", digits: 0, get: V("management") },
   { key: "lootChance", label: "Grobio tikimybė", unit: "%", digits: 0, get: V("lootChance") },
 ];
-export const metricsFor = (c: Category): Metric[] => (c === "attack" ? COMBAT_METRICS : c === "loot" ? [ECO_METRICS[5], ...ECO_METRICS.slice(0, 5), COMBAT_METRICS[1]] : ECO_METRICS);
+const M = (key: string) => [...COMBAT_METRICS, ...ECO_METRICS].find((m) => m.key === key)!;
+export const metricsFor = (id: ProfileId): Metric[] => ({
+  damage: COMBAT_METRICS,
+  crit: ["perHit", "attack", "crit", "critDmg", "hit"].map(M),
+  loot: ["lootChance", "health", "armor", "dodge", "perBar"].map(M),
+  economy: ECO_METRICS,
+}[id]);
+
+/** Kiek tinka kiekvienas top build'as šiam žaidėjui: jų lygiai (pritaikyti jūsų taškams) su JŪSŲ įranga. */
+export function rankByFit(players: TopPlayer[], user: UserLite, cfg: GameConfig, eq: Equipment, id: ProfileId) {
+  const prof = PROFILES[id], gear = currentGear(eq);
+  const pct = AMMO.find((a) => a.code === eq.ammo)?.pct ?? 0;
+  const ctx = makeCtx(user, cfg, pct);
+  const cur = Object.fromEntries(SKILL_KEYS.map((k) => [k, user.skills?.[k]?.level ?? 0])) as Levels;
+  const base = prof.score(skillTotals(cur, gear, ctx));
+  return players.map((p) => {
+    const lv = adaptLevels(cfg.skills, p.levels, user.leveling.totalSkillPoints, user.leveling.level);
+    return { p, gain: (Math.exp(prof.score(skillTotals(lv, gear, ctx)) - base) - 1) * 100 };
+  });
+}
 
 export interface GearDiff { slot: Slot; now: GearPick; next: GearPick; change: boolean }
 export interface Comparison {
   levelsNow: Levels; levelsNext: Levels; exact: boolean; spentNext: number; budget: number; refund: number; missing: number;
-  valsNow: Vals; valsNext: Vals; gear: GearDiff[]; gearCost: number; ammo: string | null;
+  valsNow: Vals; valsNext: Vals; valsNextGear: Vals; gear: GearDiff[]; gearCost: number; ammo: string | null;
 }
 
 export function compare(user: UserLite, cfg: GameConfig, eq: Equipment, b: TopPlayer, prices: Prices, applyGear: boolean): Comparison {
@@ -102,12 +122,13 @@ export function compare(user: UserLite, cfg: GameConfig, eq: Equipment, b: TopPl
   const ammo = applyGear ? b.ammo ?? eq.ammo ?? null : eq.ammo ?? null;
   const pct = (c: string | null) => AMMO.find((a) => a.code === c)?.pct ?? 0;
   const valsNow = skillTotals(levelsNow, gearNow, makeCtx(user, cfg, pct(eq.ammo ?? null)));
-  const valsNext = skillTotals(levelsNext, next, makeCtx(user, cfg, pct(ammo)));
+  const valsNext = skillTotals(levelsNext, gearNow, makeCtx(user, cfg, pct(eq.ammo ?? null))); // tik skill'ai, jūsų įranga
+  const valsNextGear = skillTotals(levelsNext, next, makeCtx(user, cfg, pct(ammo)));
   const wantCost = costOfLevels(cfg.skills, b.levels);
   return {
     levelsNow, levelsNext, exact: wantCost <= budget, spentNext: costOfLevels(cfg.skills, levelsNext), budget,
     refund: pointsToRefund(cfg.skills, levelsNow, levelsNext), missing: Math.max(0, wantCost - budget),
-    valsNow, valsNext, gear, gearCost: gear.reduce((s, g) => s + (g.change && !g.next.owned ? g.next.price : 0), 0), ammo,
+    valsNow, valsNext, valsNextGear, gear, gearCost: gear.reduce((s, g) => s + (g.change && !g.next.owned ? g.next.price : 0), 0), ammo,
   };
 }
 void levelValue;

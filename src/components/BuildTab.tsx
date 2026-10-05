@@ -1,93 +1,155 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { GameImg, Icon, itemPath } from "./Icon";
 import { Segments } from "./Segments";
-import { CombatChips } from "./StatsTab";
 import { AMMO_LABEL, SKILL, SLOT_LABEL, TIER_LABEL, fmt, money } from "../lib/labels";
-import { PROFILES, SLOTS, tierOf, type Prices, type ProfileId } from "../lib/model";
-import { AMMO, currentState, planFor, pointsToRefund } from "../lib/optimizer";
+import { PROFILES, PROFILE_TOP, tierOf, type Levels, type Prices, type ProfileId, type Vals } from "../lib/model";
+import { currentState, planFor, pointsToRefund } from "../lib/optimizer";
 import { SKILL_KEYS, type Equipment, type GameConfig, type UserLite } from "../lib/types";
+import { compare, loadTop, metricsFor, rankByFit, type Metric, type TopFile, type TopPlayer } from "../lib/top";
 
-const BUDGETS = [0, 25, 100, 500, 2000, Infinity];
+const sign = (n: number) => (n > 0 ? "+" : "");
+const hasGear = (p: TopPlayer) => Object.values(p.gear).some(Boolean);
+
+function Metrics({ metrics, a, b }: { metrics: Metric[]; a: Vals; b: Vals }) {
+  return (
+    <table className="cmp"><thead><tr><th></th><th>Dabar</th><th>Po</th><th>Skirt.</th><th>%</th></tr></thead><tbody>
+      {metrics.map((m) => {
+        const x = m.get(a), y = m.get(b), d = y - x, pc = x ? (d / x) * 100 : 0, cls = Math.abs(pc) < 0.5 ? "" : d > 0 ? "pos" : "neg";
+        return (
+          <tr key={m.key}><td>{m.label}</td><td>{fmt(x, m.digits)}{m.unit}</td><td>{fmt(y, m.digits)}{m.unit}</td>
+            <td className={cls}>{sign(d)}{fmt(d, m.digits)}{m.unit}</td><td className={cls}>{x ? `${sign(pc)}${fmt(pc, 0)}%` : "—"}</td></tr>
+        );
+      })}
+    </tbody></table>
+  );
+}
+
+/** Tik pasikeitę skill'ai: dabar → siūloma. */
+function Changes({ now, next, theirs }: { now: Levels; next: Levels; theirs?: Levels }) {
+  const ks = SKILL_KEYS.filter((k) => now[k] !== next[k]);
+  if (!ks.length) return <p className="blurb">Skill’ų keisti nereikia.</p>;
+  return (
+    <div className="skills">
+      {ks.map((k) => {
+        const d = next[k] - now[k];
+        return (
+          <div key={k} className="skill">
+            <div className="skill-h" style={{ color: SKILL[k].color }}>
+              <Icon name={k} size={16} /><span>{SKILL[k].name}</span>
+              <small>{now[k]} → <b>{next[k]}</b>{theirs && theirs[k] !== next[k] ? ` (jų ${theirs[k]})` : ""}</small>
+              <em className={d > 0 ? "pos" : "neg"}>{sign(d)}{d}</em>
+            </div>
+            <Segments k={k} level={now[k]} plan={next[k]} />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export function BuildTab({ user, cfg, eq, prices }: { user: UserLite; cfg: GameConfig; eq: Equipment; prices: Prices }) {
   const [pid, setPid] = useState<ProfileId>("damage");
-  const [budget, setBudget] = useState(100);
-  const [keepEco, setKeepEco] = useState(true);
-  const lockEco = keepEco && pid !== "economy";
+  const [file, setFile] = useState<TopFile | null>(null);
+  const [err, setErr] = useState("");
+  const [sel, setSel] = useState<string | null>(null);
   const profile = PROFILES[pid];
+  const metrics = metricsFor(pid);
+  const resetPer = cfg.user?.resetSkillsCostPerPoint ?? 0;
+
+  useEffect(() => { setFile(null); setErr(""); setSel(null); loadTop(PROFILE_TOP[pid]).then(setFile).catch((e) => setErr(e.message)); }, [pid]);
+
+  // 1) tinkamiausias build'as pagal jūsų statistiką (modelis, jūsų dabartinė įranga)
   const now = useMemo(() => currentState(user, cfg, eq, profile), [user, cfg, eq, profile]);
-  const plan = useMemo(() => planFor(user, cfg, eq, profile, prices, budget, true, lockEco), [user, cfg, eq, profile, prices, budget, lockEco]);
-  const refund = pointsToRefund(cfg.skills, now.levels, plan.levels);
-  const resetCost = refund * (cfg.user?.resetSkillsCostPerPoint ?? 0);
-  const gain = (Math.exp(plan.score - now.score) - 1) * 100;
-  const changed = SLOTS.filter((s) => plan.gear[s].code !== now.gear[s].code);
-  const noPrices = Object.keys(prices).filter((k) => /\d$|^(knife|gun|rifle|sniper|tank|jet)$/.test(k) && prices[k] != null).length === 0;
+  const model = useMemo(() => planFor(user, cfg, eq, profile, {}, 0, false, false), [user, cfg, eq, profile]);
+  const modelGain = (Math.exp(model.score - now.score) - 1) * 100;
+  const modelRefund = pointsToRefund(cfg.skills, now.levels, model.levels);
+
+  // 2) tinkamiausias iš top 100 + top 10 sąrašas
+  const fits = useMemo(() => (file ? rankByFit(file.players, user, cfg, eq, pid) : []), [file, user, cfg, eq, pid]);
+  const best = useMemo(() => fits.reduce<(typeof fits)[number] | null>((b, f) => (!b || f.gain > b.gain ? f : b), null), [fits]);
+  const top10 = fits.slice(0, 10);
+  const bestInTop10 = !!best && top10.some((f) => f.p.id === best.p.id);
+  const chosen = (sel && fits.find((f) => f.p.id === sel)?.p) || best?.p || null;
+  const cmp = useMemo(() => (chosen ? compare(user, cfg, eq, chosen, prices, true) : null), [chosen, user, cfg, eq, prices]);
+  const chosenGain = chosen ? fits.find((f) => f.p.id === chosen.id)?.gain ?? 0 : 0;
+  const m0 = metrics[0];
+
+  const Row = ({ f, star }: { f: (typeof fits)[number]; star?: boolean }) => (
+    <button className={"toprow" + (chosen?.id === f.p.id ? " on" : "")} onClick={() => setSel(f.p.id)}>
+      <span className="badge">#{f.p.rank}</span>
+      {f.p.avatarUrl ? <img className="gimg av-s" src={f.p.avatarUrl} alt="" width={28} height={28} loading="lazy" /> : <Icon name="user" size={22} />}
+      <span className="nm"><b>{star && "★ "}{f.p.username}</b><small>L{f.p.level}{!hasGear(f.p) ? " · be įrangos" : ""}</small></span>
+      <span className={"fit " + (f.gain >= 0 ? "pos" : "neg")}>{sign(f.gain)}{fmt(f.gain, 0)}%</span>
+      {best?.p.id === f.p.id && <span className="best">Tinkamiausias</span>}
+    </button>
+  );
 
   return (
-    <div className="cols">
-      <div className="col">
+    <>
       <div className="tabs sub" role="tablist">
-        {Object.values(PROFILES).map((p) => (
+        {(Object.values(PROFILES)).map((p) => (
           <button key={p.id} role="tab" aria-selected={p.id === pid} className={p.id === pid ? "on" : ""} onClick={() => setPid(p.id)}>{p.name}</button>
         ))}
       </div>
-      <p className="blurb">{profile.blurb}. Lygis {user.leveling.level}, {plan.budget} taškų.</p>
-      {pid !== "economy" && <div className="pills" style={{ marginTop: 8 }}><button className={keepEco ? "on" : ""} onClick={() => setKeepEco(!keepEco)}>{keepEco ? "✓ " : ""}Palikti ekonomikos skill’us</button></div>}
+      <p className="blurb">{profile.blurb}. Lygis {user.leveling.level}, {user.leveling.totalSkillPoints} skill taškų.</p>
 
-      <div className="sect">Įrangos biudžetas <GameImg path="itemsv2/gold.png" size={16} fallback="coin" /></div>
-      <div className="pills">
-        {BUDGETS.map((b) => <button key={b} className={b === budget ? "on" : ""} onClick={() => setBudget(b)}>{b === Infinity ? "Be ribos" : b === 0 ? "Nieko" : b}</button>)}
-      </div>
-      {noPrices && <p className="warn">Nepavyko gauti rinkos kainų – įranga nesiūloma.</p>}
+      <div className="cols">
+        <div className="col">
+          <div className="sect"><Icon name="star" size={14} /> Tinkamiausias pagal jūsų statistiką</div>
+          <div className="result">
+            <div><small>Efektyvumas</small><b className={modelGain >= 0 ? "pos" : "neg"}>{sign(modelGain)}{fmt(modelGain, 0)}%</b></div>
+            <div><small>Perskirstyti</small><b>{modelRefund} tšk.</b></div>
+            <div><small>Reset kaina</small><b>{money(modelRefund * resetPer)}</b></div>
+          </div>
+          <Metrics metrics={metrics} a={now.vals} b={model.vals} />
+          <div className="sect">Ką pakeisti</div>
+          <Changes now={now.levels} next={model.levels} />
+          <p className="note">Skaičiuota pagal jūsų skill’us, dabartinę įrangą ir API duomenis. Modelis orientacinis.</p>
+        </div>
 
-      <div className="result">
-        <div><small>Efektyvumas</small><b className="pos">{gain >= 0 ? "+" : ""}{fmt(gain, 0)}%</b></div>
-        <div><small>Įranga kainuos</small><b>{money(plan.gearCost)}</b></div>
-        <div><small>Reset</small><b>{refund} tšk. · {money(resetCost)}</b></div>
-      </div>
-      <CombatChips vals={plan.vals} />
-
-      <div className="sect">Įranga <small>pirkimo sąrašas</small></div>
-      <div className="shop">
-        {changed.length === 0 && <p className="blurb">Su šiuo biudžetu geresnių pirkinių nėra.</p>}
-        {changed.map((s) => {
-          const g = plan.gear[s]; const t = g.code ? tierOf(s, g.code) : -1;
-          return (
-            <div key={s} className={"row t" + t}>
-              <GameImg path={itemPath(s, g.code)} size={38} />
-              <div><b>{SLOT_LABEL[s]}: {g.code ? TIER_LABEL[t] : "nenaudoti"}</b>
-                <small>{g.code ?? ""} · {Object.entries(g.stats).map(([k, v]) => `${SKILL[k as keyof typeof SKILL].name} ~${fmt(v, 0)}`).join(", ")}</small></div>
-              <span className="price">{g.owned ? "turi" : money(g.price)}</span>
-            </div>
-          );
-        })}
-        <div className="row">
-          <GameImg path={itemPath("ammo", plan.ammo)} size={38} />
-          <div><b>Šoviniai: {plan.ammo ? AMMO_LABEL[plan.ammo] : "—"}</b>
-            <small>+{AMMO.find((a) => a.code === plan.ammo)?.pct ?? 0}% atakos · {plan.ammo && prices[plan.ammo] != null ? `${money(prices[plan.ammo]!)} / vnt.` : ""}</small></div>
+        <div className="col">
+          <div className="sect"><Icon name="attack" size={14} /> Tinkamiausias iš TOP <small>{file ? `top ${file.players.length} · ${file.label}` : ""}</small></div>
+          {err && <p className="warn">{err}</p>}
+          {!file && !err && <p className="blurb">Kraunama…</p>}
+          {file && best && chosen && cmp && (
+            <>
+              {PROFILE_TOP[pid] === "loot" && <p className="note" style={{ marginTop: 0 }}>Grobiui API neturi reitingo – naudojamos atidarytos dėžės.</p>}
+              <div className="top10">
+                {!bestInTop10 && <Row f={best} star />}
+                {top10.map((f) => <Row key={f.p.id} f={f} />)}
+              </div>
+              <div className="sect">Palyginimas su {chosen.username}{best.p.id === chosen.id ? " ★" : ""}</div>
+              <div className="result">
+                <div><small>Efektyvumas</small><b className={chosenGain >= 0 ? "pos" : "neg"}>{sign(chosenGain)}{fmt(chosenGain, 0)}%</b></div>
+                <div><small>Jų lygis / taškai</small><b>{chosen.level} / {chosen.totalSkillPoints}</b></div>
+                <div><small>Reset</small><b>{cmp.refund} tšk. · {money(cmp.refund * resetPer)}</b></div>
+              </div>
+              {!cmp.exact && <p className="warn">Jų build’ui trūksta {cmp.missing} tšk. – lygiai sumažinti proporcingai.</p>}
+              <Metrics metrics={metrics} a={cmp.valsNow} b={cmp.valsNext} />
+              <div className="sect">Ką pakeisti</div>
+              <Changes now={cmp.levelsNow} next={cmp.levelsNext} theirs={chosen.levels} />
+              <div className="sect">Jų įranga {hasGear(chosen) && m0 && <small>papildomai {sign(m0.get(cmp.valsNextGear) / (m0.get(cmp.valsNext) || 1) * 100 - 100)}{fmt(m0.get(cmp.valsNextGear) / (m0.get(cmp.valsNext) || 1) * 100 - 100, 0)}% ({m0.label.toLowerCase()})</small>}</div>
+              {!hasGear(chosen) ? <p className="blurb">Šis žaidėjas šiuo metu nenaudoja įrangos.</p> : (
+                <div className="shop">
+                  {cmp.gear.filter((g) => g.change).map((g) => {
+                    const t = g.next.code ? tierOf(g.slot, g.next.code) : -1, t0 = g.now.code ? tierOf(g.slot, g.now.code) : -1;
+                    return (
+                      <div key={g.slot} className={"row t" + t}>
+                        <GameImg path={itemPath(g.slot, g.next.code)} size={34} />
+                        <div><b>{SLOT_LABEL[g.slot]}: {g.now.code ? TIER_LABEL[t0] : "—"} → {g.next.code ? TIER_LABEL[t] : "—"}</b></div>
+                        <span className="price">{g.next.owned ? "turite" : money(g.next.price)}</span>
+                      </div>
+                    );
+                  })}
+                  {cmp.gear.every((g) => !g.change) && <p className="blurb">Įranga jau tokia pati.</p>}
+                  {cmp.ammo && cmp.ammo !== eq.ammo && <div className="row"><GameImg path={itemPath("ammo", cmp.ammo)} size={34} /><div><b>Šoviniai: {AMMO_LABEL[cmp.ammo] ?? cmp.ammo}</b></div></div>}
+                  {cmp.gearCost > 0 && <p className="note">Įrangos kaina: {money(cmp.gearCost)} (rinkos sandorių mediana, vidutinis rolas).</p>}
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
-      <p className="note">Statai pirktoms prekėms – vidutinis rolas. Kainos – paskutinių rinkos sandorių mediana. Formulės ir „soft cap“ iš dalies išvestos pagal API duomenis, todėl rezultatas orientacinis.</p>
-      </div>
-      <div className="col">
-      <div className="sect">Skill taškai <small>dabar → siūloma</small></div>
-      <div className="skills">
-        {SKILL_KEYS.filter((k) => plan.levels[k] || now.levels[k]).map((k) => {
-          const d = plan.levels[k] - now.levels[k];
-          return (
-            <div key={k} className="skill">
-              <div className="skill-h" style={{ color: SKILL[k].color }}>
-                <Icon name={k} size={16} /><span>{SKILL[k].name}</span>
-                <small>{now.levels[k]} → <b>{plan.levels[k]}</b></small>
-                <em className={d > 0 ? "pos" : d < 0 ? "neg" : ""}>{d > 0 ? `+${d}` : d < 0 ? d : ""}</em>
-              </div>
-              <Segments k={k} level={now.levels[k]} plan={plan.levels[k]} />
-            </div>
-          );
-        })}
-      </div>
-
-      </div>
-    </div>
+    </>
   );
 }

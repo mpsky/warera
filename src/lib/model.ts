@@ -70,23 +70,31 @@ export function combat(v: Vals): Combat {
   return { attack: v.attack, hit, crit, critDmg, perHit, armorEff, dodgeEff, hp: v.health, perBar };
 }
 
-export type ProfileId = "damage" | "tank" | "economy";
+export type ProfileId = "damage" | "crit" | "loot" | "economy";
 export interface Profile { id: ProfileId; name: string; blurb: string; score: (v: Vals) => number }
 const ln = (x: number) => Math.log(Math.max(1e-9, x));
+/** Kritinė žalos dalis: kiek kritai prideda prie vidutinės žalos. */
+const critBoost = (v: Vals) => 1 + Math.min(1, v.criticalChance / 100) * (v.criticalDamages / 100);
 export const PROFILES: Record<ProfileId, Profile> = {
   damage: {
     id: "damage", name: "Žala", blurb: "Daugiausia žalos per vieną sveikatos juostą",
     score: (v) => { const c = combat(v); return ln(c.perBar) + 0.15 * ln(v.hunger); },
   },
-  tank: {
-    id: "tank", name: "Tankas", blurb: "Išgyvenimas: sveikata, šarvai, išsisukimas + vidutinė žala",
-    score: (v) => { const c = combat(v); return ln(v.health) - ln(1 - c.armorEff) - ln(1 - c.dodgeEff) + 0.35 * ln(c.perHit) + 0.15 * ln(v.hunger); },
+  crit: {
+    id: "crit", name: "Kritai", blurb: "Kritinių smūgių build’as: krit. tikimybė ir žala + bazinė ataka",
+    score: (v) => { const c = combat(v); return ln(c.perBar) + 1.2 * ln(critBoost(v)); },
+  },
+  loot: {
+    id: "loot", name: "Grobis", blurb: "Daugiausia smūgių ir grobio tikimybės (grobis krenta per smūgį)",
+    score: (v) => { const c = combat(v); return ln(v.lootChance) + ln(v.health) - ln(1 - c.armorEff) - ln(1 - c.dodgeEff) + 0.2 * ln(c.perHit); },
   },
   economy: {
     id: "economy", name: "Ekonomika", blurb: "Gamyba, energija, verslumas, įmonės ir vadyba",
     score: (v) => ln(v.production) + 0.5 * ln(v.energy) + 0.4 * ln(v.entrepreneurship) + 0.35 * ln(v.companies) + 0.3 * ln(v.management) + 0.1 * ln(v.lootChance),
   },
 };
+/** Kuris top-100 failas atitinka profilį. */
+export const PROFILE_TOP: Record<ProfileId, "attack" | "loot" | "economy"> = { damage: "attack", crit: "attack", loot: "loot", economy: "economy" };
 
 // ---------- įranga ----------
 export const emptyPick = (): GearPick => ({ code: null, stats: {}, price: 0, owned: true });
