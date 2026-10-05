@@ -51,3 +51,17 @@ describe("planner", () => {
     expect(planFor(user, c, {}, PROFILES.damage, { helmet3: 50 }, 100, true).gear.helmet.code).toBe("helmet3");
   });
 });
+
+import { adaptLevels, costOfLevels } from "./top";
+describe("adaptLevels", () => {
+  const target = Object.fromEntries(SKILL_KEYS.map((k) => [k, k === "attack" ? 10 : k === "health" ? 6 : 0])) as never;
+  it("matches exactly when the budget allows", () => {
+    expect(adaptLevels(cfg.skills, target, 1000, 30)).toEqual(target);
+  });
+  it("scales proportionally and never exceeds the budget", () => {
+    const l = adaptLevels(cfg.skills, target, 20, 30);
+    expect(costOfLevels(cfg.skills, l)).toBeLessThanOrEqual(20);
+    expect(l.attack).toBeGreaterThan(0); expect(l.health).toBeGreaterThan(0);
+    expect(l.attack).toBeGreaterThanOrEqual(l.health);
+  });
+});

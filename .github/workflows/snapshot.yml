@@ -1,0 +1,17 @@
+name: Refresh top builds
+on:
+  schedule: [{ cron: "17 */6 * * *" }]
+  workflow_dispatch:
+permissions: { contents: write }
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node scripts/snapshot.mjs
+        env: { WARERA_API_KEY: "${{ secrets.WARERA_API_KEY }}" }
+      - run: |
+          git config user.name "github-actions"; git config user.email "actions@users.noreply.github.com"
+          git add public/data && (git diff --cached --quiet || git commit -m "Refresh top builds" && git push)

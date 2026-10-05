@@ -98,3 +98,17 @@ button:active{filter:brightness(.9)}button:disabled{opacity:.6}
 .gimg{object-fit:contain;display:inline-block;vertical-align:middle;flex:none}
 .sub{display:flex;align-items:center;gap:4px}
 .cell .gimg{filter:drop-shadow(0 2px 3px #0008)}
+
+.top10{display:grid;gap:5px}
+.toprow{display:flex;align-items:center;gap:8px;padding:6px 8px;min-height:44px;width:100%;text-align:left;background:var(--row);color:var(--tx);box-shadow:var(--edge)}
+.toprow.on{background:linear-gradient(45deg,var(--red1),var(--red2));color:var(--red-xl)}
+.toprow .badge{min-width:30px;color:var(--red-l);font-size:12px}
+.toprow .nm{flex:1;min-width:0}.toprow .nm b,.toprow .nm small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.av-s{border-radius:50%;background:#000}
+.dots{display:flex;align-items:flex-end;gap:2px;height:30px}.dots i{width:5px;border-radius:2px;display:block}
+.cmp{width:100%;border-collapse:collapse;font-size:13px}
+.cmp td{padding:5px 4px;border-bottom:1px solid #ffffff0d;text-align:right;white-space:nowrap}
+.cmp td:first-child{text-align:left;color:var(--tx2);white-space:normal}
+.mini-btn{margin-left:auto;min-height:28px;padding:0 8px;font-size:11px;background:var(--row);color:var(--tx2);text-transform:none;letter-spacing:0}
+.mini-btn.on{color:var(--red-xl);background:linear-gradient(45deg,var(--red1),var(--red2))}
+.tabs.main button{padding:0 6px;font-size:13px}
