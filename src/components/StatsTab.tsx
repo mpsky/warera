@@ -24,9 +24,14 @@ export function CombatChips({ vals }: { vals: Vals }) {
 export function StatsTab({ user, cfg, eq, vals }: { user: UserLite; cfg: GameConfig; eq: Equipment; vals: Vals }) {
   const lv = user.leveling;
   return (
-    <>
+    <div className="cols">
+      <div className="col">
       <div className="sect">Kovos rodikliai</div>
       <CombatChips vals={vals} />
+      <div className="sect">Įranga</div>
+      <GearGrid eq={eq} />
+      </div>
+      <div className="col">
       <div className="sect">Įgūdžiai <small>{lv.spentSkillPoints}/{lv.totalSkillPoints} tšk.{lv.availableSkillPoints ? ` · laisva ${lv.availableSkillPoints}` : ""}</small></div>
       {(["combat", "eco"] as const).map((g) => (
         <div key={g} className="skills">
@@ -43,8 +48,15 @@ export function StatsTab({ user, cfg, eq, vals }: { user: UserLite; cfg: GameCon
           })}
         </div>
       ))}
-      <div className="sect">Įranga</div>
-      <div className="gear">
+      </div>
+    </div>
+  );
+}
+
+
+function GearGrid({ eq }: { eq: Equipment }) {
+  return (
+    <div className="gear">
         {SLOTS.map((slot) => {
           const it = eq[slot]; const t = it ? Math.max(0, tierOf(slot, it.code)) : -1;
           return (
@@ -58,6 +70,5 @@ export function StatsTab({ user, cfg, eq, vals }: { user: UserLite; cfg: GameCon
         })}
         <div className="cell t2" title="Šoviniai"><GameImg path={itemPath("ammo", eq.ammo)} size={44} /><b>{eq.ammo ? AMMO_LABEL[eq.ammo] ?? eq.ammo : "—"}</b><small>Šoviniai</small></div>
       </div>
-    </>
   );
 }

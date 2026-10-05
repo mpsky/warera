@@ -35,12 +35,16 @@ export function TopTab({ user, cfg, eq, prices }: { user: UserLite; cfg: GameCon
           <p className="blurb">Top 100 pagal „{file.label}“. Atnaujinta {new Date(file.updatedAt).toLocaleDateString("lt-LT")}.
             {cat === "loot" && " Grobiui API neturi atskiro reitingo – naudojamos atidarytos dėžės."}</p>
 
+          <div className="cols">
+          <div className="col col-sticky">
           <div className="sect">Top 10 buildų <small>pasirinkite lyginimui</small></div>
           <div className="top10">
             <Row p={meta} active={sel === "meta"} onClick={() => setSel("meta")} badge="Ø" />
             {top10.map((p) => <Row key={p.id} p={p} active={sel === p.id} onClick={() => setSel(p.id)} badge={`#${p.rank}`} value={`${fmt(p.value, 0)}`} />)}
           </div>
 
+          </div>
+          <div className="col">
           <div className="sect">Palyginimas su {chosen.username}</div>
           <div className="result">
             <div><small>Jų lygis / taškai</small><b>{chosen.level} / {chosen.totalSkillPoints}</b></div>
@@ -99,6 +103,8 @@ export function TopTab({ user, cfg, eq, prices }: { user: UserLite; cfg: GameCon
               <div><b>Šoviniai: {cmp.ammo ? AMMO_LABEL[cmp.ammo] ?? cmp.ammo : "—"}</b></div></div>
           </div>
           <p className="note">Įranga skaičiuojama su vidutiniu rolu; „po cap“ rodikliai pritaikyti žaidimo soft cap taisyklei. Kainos – rinkos sandorių mediana, bendra suma: {money(cmp.gearCost)}.</p>
+          </div>
+          </div>
         </>
       )}
     </>

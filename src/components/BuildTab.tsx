@@ -24,7 +24,8 @@ export function BuildTab({ user, cfg, eq, prices }: { user: UserLite; cfg: GameC
   const noPrices = Object.keys(prices).filter((k) => /\d$|^(knife|gun|rifle|sniper|tank|jet)$/.test(k) && prices[k] != null).length === 0;
 
   return (
-    <>
+    <div className="cols">
+      <div className="col">
       <div className="tabs sub" role="tablist">
         {Object.values(PROFILES).map((p) => (
           <button key={p.id} role="tab" aria-selected={p.id === pid} className={p.id === pid ? "on" : ""} onClick={() => setPid(p.id)}>{p.name}</button>
@@ -45,23 +46,6 @@ export function BuildTab({ user, cfg, eq, prices }: { user: UserLite; cfg: GameC
         <div><small>Reset</small><b>{refund} tšk. · {money(resetCost)}</b></div>
       </div>
       <CombatChips vals={plan.vals} />
-
-      <div className="sect">Skill taškai <small>dabar → siūloma</small></div>
-      <div className="skills">
-        {SKILL_KEYS.filter((k) => plan.levels[k] || now.levels[k]).map((k) => {
-          const d = plan.levels[k] - now.levels[k];
-          return (
-            <div key={k} className="skill">
-              <div className="skill-h" style={{ color: SKILL[k].color }}>
-                <Icon name={k} size={16} /><span>{SKILL[k].name}</span>
-                <small>{now.levels[k]} → <b>{plan.levels[k]}</b></small>
-                <em className={d > 0 ? "pos" : d < 0 ? "neg" : ""}>{d > 0 ? `+${d}` : d < 0 ? d : ""}</em>
-              </div>
-              <Segments k={k} level={now.levels[k]} plan={plan.levels[k]} />
-            </div>
-          );
-        })}
-      </div>
 
       <div className="sect">Įranga <small>pirkimo sąrašas</small></div>
       <div className="shop">
@@ -84,6 +68,26 @@ export function BuildTab({ user, cfg, eq, prices }: { user: UserLite; cfg: GameC
         </div>
       </div>
       <p className="note">Statai pirktoms prekėms – vidutinis rolas. Kainos – paskutinių rinkos sandorių mediana. Formulės ir „soft cap“ iš dalies išvestos pagal API duomenis, todėl rezultatas orientacinis.</p>
-    </>
+      </div>
+      <div className="col">
+      <div className="sect">Skill taškai <small>dabar → siūloma</small></div>
+      <div className="skills">
+        {SKILL_KEYS.filter((k) => plan.levels[k] || now.levels[k]).map((k) => {
+          const d = plan.levels[k] - now.levels[k];
+          return (
+            <div key={k} className="skill">
+              <div className="skill-h" style={{ color: SKILL[k].color }}>
+                <Icon name={k} size={16} /><span>{SKILL[k].name}</span>
+                <small>{now.levels[k]} → <b>{plan.levels[k]}</b></small>
+                <em className={d > 0 ? "pos" : d < 0 ? "neg" : ""}>{d > 0 ? `+${d}` : d < 0 ? d : ""}</em>
+              </div>
+              <Segments k={k} level={now.levels[k]} plan={plan.levels[k]} />
+            </div>
+          );
+        })}
+      </div>
+
+      </div>
+    </div>
   );
 }
