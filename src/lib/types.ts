@@ -1,8 +1,8 @@
 // Tipai paimti iš WarEraProjects/TRPC (Responses.d.ts); palikti tik naudojami laukai.
+// Eilė kaip žaidime: Kovos įgūdžiai, tada Ekonominiai įgūdžiai.
 export const SKILL_KEYS = [
-  "attack", "criticalChance", "criticalDamages", "precision", "armor", "dodge",
-  "health", "energy", "hunger", "production", "entrepreneurship", "companies",
-  "management", "lootChance",
+  "attack", "precision", "criticalChance", "criticalDamages", "armor", "dodge", "health", "lootChance", "hunger",
+  "entrepreneurship", "energy", "production", "companies", "management",
 ] as const;
 export type SkillKey = (typeof SKILL_KEYS)[number];
 

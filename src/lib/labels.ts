@@ -15,7 +15,7 @@ export const SKILL: Record<SkillKey, { name: string; color: string; bg: string; 
   entrepreneurship: { name: "Verslumas", color: "#e07ad8", bg: "#7a2a72", desc: "Savarankiškas darbas", group: "eco" },
   companies: { name: "Įmonių riba", color: "#f0c050", bg: "#7a5a16", desc: "Kiek įmonių gali turėti", group: "eco" },
   management: { name: "Vadyba", color: "#b49cf0", bg: "#4a3a8a", desc: "Valdomi darbuotojai", group: "eco" },
-  lootChance: { name: "Grobio tikimybė", color: "#6fe0a0", bg: "#1f6a3c", desc: "Grobis per smūgį", group: "eco" },
+  lootChance: { name: "Grobio tikimybė", color: "#6fe0a0", bg: "#1f6a3c", desc: "Grobis per smūgį", group: "combat" },
 };
 export const SLOT_LABEL: Record<Slot, string> = { weapon: "Ginklas", helmet: "Šalmas", chest: "Šarvai", gloves: "Pirštinės", pants: "Kelnės", boots: "Batai" };
 export const TIER_LABEL = ["Paprastas", "Neįprastas", "Retas", "Epinis", "Legendinis", "Mitinis"];
